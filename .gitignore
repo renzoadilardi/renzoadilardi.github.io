@@ -1,0 +1,6 @@
+.DS_Store
+*.tiff
+*.tif
+Scorpion.txt
+.vscode/
+.claude/
