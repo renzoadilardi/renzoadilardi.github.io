@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TandemFISH: Automated FISH Probe Design</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Lora:ital,wght@0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:         #f9f8f5;
+      --bg-white:   #ffffff;
+      --text:       #18181a;
+      --text-2:     #4b4b52;
+      --text-3:     #9a9a9f;
+      --accent:     #1a56a0;
+      --accent-lt:  #e8f0fb;
+      --teal:       #0d7a6e;
+      --teal-lt:    #e6f4f2;
+      --gold:       #92610a;
+      --gold-lt:    #fdf3dc;
+      --border:     #e8e5de;
+      --border-2:   #d0ccc2;
+      --radius:     8px;
+    }
+
+    html { scroll-behavior: smooth; scroll-padding-top: 70px; }
+
+    body {
+      font-family: "Inter", sans-serif;
+      font-weight: 300;
+      font-size: 0.92rem;
+      line-height: 1.7;
+      color: var(--text);
+      background: var(--bg);
+    }
+
+    /* ── Nav ──────────────────────────────────────────────────────────────── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 56px;
+      z-index: 100;
+      background: rgba(249,248,245,.88);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2rem;
+    }
+    .nav-brand {
+      font-family: "Lora", serif;
+      font-weight: 600;
+      font-size: 1rem;
+      color: var(--text);
+      text-decoration: none;
+    }
+    .nav-brand span { color: var(--accent); }
+    .nav-links { display: flex; gap: 2.2rem; }
+    .nav-links a {
+      font-size: 0.82rem;
+      font-weight: 400;
+      color: var(--text-2);
+      text-decoration: none;
+      border-bottom: 1.5px solid transparent;
+      padding-bottom: 1px;
+      transition: color .18s, border-color .18s;
+    }
+    .nav-links a:hover { color: var(--accent); border-color: var(--accent); }
+
+    /* ── Container ────────────────────────────────────────────────────────── */
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+
+    /* ── Sections ─────────────────────────────────────────────────────────── */
+    section { padding: 3.5rem 0; border-bottom: 1px solid var(--border); }
+    section:last-of-type { border-bottom: none; }
+
+    .section-label {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.65rem;
+      font-weight: 500;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--text-3);
+      margin-bottom: 0.6rem;
+    }
+
+    h2 {
+      font-family: "Lora", serif;
+      font-weight: 600;
+      font-size: 1.8rem;
+      color: var(--text);
+      margin-bottom: 1rem;
+      line-height: 1.3;
+    }
+
+    p { color: var(--text-2); margin-bottom: 1rem; }
+    p:last-child { margin-bottom: 0; }
+
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* ── Hero ─────────────────────────────────────────────────────────────── */
+    .hero {
+      padding-top: calc(56px + 3.5rem);
+      padding-bottom: 3.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .hero-label {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--text-3);
+      margin-bottom: 0.8rem;
+    }
+    .hero h1 {
+      font-family: "Lora", serif;
+      font-weight: 600;
+      font-size: clamp(2.2rem, 5vw, 3rem);
+      line-height: 1.2;
+      color: var(--text);
+      margin-bottom: 1.2rem;
+    }
+    .hero h1 span { color: var(--accent); }
+    .hero-desc {
+      font-size: 1rem;
+      font-weight: 300;
+      color: var(--text-2);
+      margin-bottom: 1.5rem;
+      line-height: 1.7;
+    }
+    .hero-statement {
+      border-left: 3px solid var(--teal);
+      padding-left: 1rem;
+      margin: 1.5rem 0;
+      font-family: "Lora", serif;
+      font-style: italic;
+      font-size: 0.96rem;
+      color: var(--text-2);
+    }
+    .tags { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 1.5rem 0; }
+    .tag {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.68rem;
+      font-weight: 500;
+      background: var(--accent-lt);
+      color: var(--accent);
+      padding: 0.25rem 0.65rem;
+      border-radius: 4px;
+      letter-spacing: 0.03em;
+    }
+    .tag.teal { background: var(--teal-lt); color: var(--teal); }
+    .hero-links { display: flex; gap: 1rem; margin-top: 1.8rem; flex-wrap: wrap; }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.55rem 1.3rem;
+      border-radius: var(--radius);
+      font-size: 0.84rem;
+      font-weight: 500;
+      text-decoration: none;
+      transition: all .18s;
+    }
+    .btn-primary {
+      background: var(--accent);
+      color: white;
+    }
+    .btn-primary:hover { background: #1346880; filter: brightness(1.1); text-decoration: none; }
+    .btn-outline {
+      border: 1.5px solid var(--border-2);
+      color: var(--text-2);
+      background: transparent;
+    }
+    .btn-outline:hover { border-color: var(--accent); color: var(--accent); text-decoration: none; }
+
+    /* ── Pipeline ─────────────────────────────────────────────────────────── */
+    .pipeline-steps {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0;
+      align-items: center;
+      margin: 1.8rem 0;
+    }
+    .pipe-step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: var(--bg-white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 0.8rem 1rem;
+      min-width: 100px;
+      text-align: center;
+    }
+    .pipe-step .pnum {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.62rem;
+      font-weight: 500;
+      color: var(--text-3);
+      letter-spacing: .05em;
+      margin-bottom: 0.3rem;
+    }
+    .pipe-step .pname {
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--text);
+      margin-bottom: 0.2rem;
+    }
+    .pipe-step .ptool {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.66rem;
+      color: var(--teal);
+    }
+    .pipe-arrow {
+      color: var(--border-2);
+      font-size: 1.1rem;
+      margin: 0 0.3rem;
+      flex-shrink: 0;
+    }
+
+    /* ── Info box ─────────────────────────────────────────────────────────── */
+    .info-box {
+      background: var(--accent-lt);
+      border-left: 3px solid var(--accent);
+      border-radius: 0 var(--radius) var(--radius) 0;
+      padding: 1rem 1.3rem;
+      margin: 1.5rem 0;
+      font-size: 0.88rem;
+      color: var(--text-2);
+    }
+
+    /* ── Examples ─────────────────────────────────────────────────────────── */
+    .example-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin: 1.8rem 0;
+    }
+    @media (max-width: 600px) { .example-grid { grid-template-columns: 1fr; } }
+
+    .example-card {
+      background: var(--bg-white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      transition: box-shadow .2s;
+    }
+    .example-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,.08); }
+    .card-top {
+      border-bottom: 1px solid var(--border);
+      padding: 0.9rem 1.1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+    }
+    .card-top h3 {
+      font-family: "Lora", serif;
+      font-style: italic;
+      font-size: 0.96rem;
+      font-weight: 400;
+      color: var(--text);
+    }
+    .card-top .assembly {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.62rem;
+      color: var(--text-3);
+      letter-spacing: .05em;
+    }
+    .card-body { padding: 1.1rem; }
+    .card-stats {
+      display: flex;
+      gap: 0.8rem;
+      margin-bottom: 1.1rem;
+    }
+    .cstat {
+      flex: 1;
+      text-align: center;
+      background: var(--bg);
+      border-radius: 6px;
+      padding: 0.5rem 0.3rem;
+    }
+    .cstat .cn {
+      font-family: "Lora", serif;
+      font-weight: 600;
+      font-size: 1.4rem;
+      color: var(--accent);
+      line-height: 1.1;
+    }
+    .cstat .cl {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.6rem;
+      color: var(--text-3);
+      margin-top: 0.15rem;
+      letter-spacing: .03em;
+    }
+    .card-map {
+      width: 100%;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+      margin-bottom: 0.9rem;
+      display: block;
+    }
+    .placeholder-map {
+      width: 100%;
+      aspect-ratio: 16/6;
+      background: var(--bg);
+      border: 1px dashed var(--border-2);
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.65rem;
+      color: var(--text-3);
+      letter-spacing: .05em;
+      text-transform: uppercase;
+      margin-bottom: 0.9rem;
+    }
+    .card-link {
+      display: block;
+      text-align: center;
+      font-size: 0.82rem;
+      font-weight: 500;
+      color: var(--accent);
+      border: 1.5px solid var(--border-2);
+      border-radius: 6px;
+      padding: 0.45rem;
+      transition: all .18s;
+      text-decoration: none;
+    }
+    .card-link:hover { border-color: var(--accent); background: var(--accent-lt); text-decoration: none; }
+    .card-link.disabled { color: var(--text-3); pointer-events: none; border-color: var(--border); }
+
+    /* ── Probe table ──────────────────────────────────────────────────────── */
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--bg-white);
+      margin-top: 1.5rem;
+    }
+    table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+    th {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.62rem;
+      font-weight: 500;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+      color: var(--text-3);
+      background: var(--bg);
+      padding: 0.55rem 0.8rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+    td {
+      padding: 0.45rem 0.8rem;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-2);
+      white-space: nowrap;
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: var(--accent-lt); }
+    .mono { font-family: "JetBrains Mono", monospace; font-size: 0.75rem; }
+    .pass-badge {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.62rem;
+      font-weight: 500;
+      background: #d4edda;
+      color: #155724;
+      padding: 0.18rem 0.5rem;
+      border-radius: 3px;
+      letter-spacing: .03em;
+    }
+    .table-caption {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.65rem;
+      color: var(--text-3);
+      letter-spacing: .05em;
+      text-transform: uppercase;
+      margin-top: 1.8rem;
+      margin-bottom: 0.5rem;
+    }
+
+    /* ── Code ─────────────────────────────────────────────────────────────── */
+    .code-block {
+      background: #1e2532;
+      border-radius: var(--radius);
+      padding: 1.2rem 1.4rem;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.78rem;
+      line-height: 1.9;
+      overflow-x: auto;
+      margin: 1.3rem 0;
+      color: #c9d1d9;
+      white-space: pre;
+    }
+    .c { color: #6a8fa8; }   /* comment */
+    .k { color: #79c0ff; }   /* keyword / command */
+    .s { color: #a5d6a7; }   /* string / path */
+
+    /* ── Fade-in ──────────────────────────────────────────────────────────── */
+    .fade-in {
+      opacity: 0;
+      transform: translateY(14px);
+      transition: opacity .5s ease, transform .5s ease;
+    }
+    .fade-in.visible { opacity: 1; transform: none; }
+
+    /* ── Footer ───────────────────────────────────────────────────────────── */
+    footer {
+      padding: 2.5rem 0;
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--text-3);
+      border-top: 1px solid var(--border);
+    }
+    footer a { color: var(--accent); }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-brand" href="#">Tandem<span>FISH</span></a>
+  <div class="nav-links">
+    <a href="index.html">← Back</a>
+    <a href="#pipeline">Pipeline</a>
+    <a href="#examples">Examples</a>
+    <a href="#usage">Usage</a>
+    <a href="https://github.com/renzoadilardi/TandemFISH" target="_blank">GitHub ↗</a>
+  </div>
+</nav>
+
+<!-- Hero -->
+<div class="hero container">
+  <div class="hero-label">Software · FISH probe design</div>
+  <h1>Tandem<span>FISH</span></h1>
+  <p class="hero-desc">
+    An automated Snakemake pipeline for designing locus-specific oligonucleotide
+    FISH probes targeting tandem repeats in any genome assembly,
+    based on <a href="https://doi.org/10.1093/g3journal/jkac121">Adilardi &amp; Dernburg, <em>G3</em> (2022)</a>.
+  </p>
+  <div class="hero-statement">
+    From genome FASTA to FISH probes: specificity-evaluated,
+    Tm-calculated, and ready to order in a single command.
+  </div>
+  <p class="hero-desc" style="margin-top:0.8rem;">
+    Each probe is a single oligonucleotide that can be commercially
+    synthesized and labeled, maximizing convenience and reproducibility.
+    Probes yield reliable signals in different tissues and are compatible
+    with immunolocalization of cellular proteins.
+  </p>
+  <div class="tags">
+    <span class="tag">Snakemake</span>
+    <span class="tag">TRF</span>
+    <span class="tag">blastn-short</span>
+    <span class="tag">Biopython Tm</span>
+    <span class="tag teal">macOS · Linux</span>
+  </div>
+  <div class="hero-links">
+    <a href="https://github.com/renzoadilardi/TandemFISH" target="_blank" class="btn btn-primary">View on GitHub</a>
+    <a href="#examples" class="btn btn-outline">See examples ↓</a>
+  </div>
+
+</div>
+
+<!-- Pipeline -->
+<section id="pipeline">
+  <div class="container fade-in">
+    <div class="section-label">How it works</div>
+    <h2>Six automated steps</h2>
+    <p>
+      The pipeline takes a genome assembly (FASTA) and a configuration file,
+      then runs six steps fully automatically, from repeat detection to
+      an HTML report with probe sequences and quality metrics.
+    </p>
+
+    <div class="pipeline-steps">
+      <div class="pipe-step">
+        <div class="pnum">Step 1</div>
+        <div class="pname">Find repeats</div>
+        <div class="ptool">TRF</div>
+      </div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-step">
+        <div class="pnum">Step 2</div>
+        <div class="pname">Filter &amp; merge</div>
+        <div class="ptool">Python</div>
+      </div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-step">
+        <div class="pnum">Step 3</div>
+        <div class="pname">BLAST database</div>
+        <div class="ptool">makeblastdb</div>
+      </div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-step">
+        <div class="pnum">Step 4</div>
+        <div class="pname">Design probes</div>
+        <div class="ptool">blastn-short</div>
+      </div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-step">
+        <div class="pnum">Step 5</div>
+        <div class="pname">Chromosome map</div>
+        <div class="ptool">matplotlib</div>
+      </div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-step">
+        <div class="pnum">Step 6</div>
+        <div class="pname">HTML report</div>
+        <div class="ptool">Python</div>
+      </div>
+    </div>
+
+    <div class="info-box">
+      Probe specificity is evaluated by BLAST against the full genome using
+      <span class="mono">blastn-short</span>. Off-target clusters on any chromosome,
+      including distant loci on the same chromosome, are detected and used as
+      exclusion criteria. Melting temperature is calculated using Biopython's
+      nearest-neighbour model.
+    </div>
+
+  </div>
+  <div class="container fade-in" style="margin-top:1.5rem;">
+    <p style="font-size:0.95rem; color:#666; font-style:italic;">
+      Note: predicted probes should be experimentally validated to confirm single-locus hybridization.
+    </p>
+  </div>
+</section>
+
+<!-- Examples -->
+<section id="examples">
+  <div class="container fade-in">
+    <div class="section-label">Validation</div>
+    <h2>Example results</h2>
+    <p>
+      Results from two nematode species. The pipeline recovers all 13
+      <em>C. elegans</em> and all 10 <em>P. pacificus</em> loci validated
+      in Adilardi &amp; Dernburg (2022), and identifies many additional
+      candidates in both species.
+    </p>
+
+    <div class="example-grid">
+
+      <!-- P. pacificus -->
+      <div class="example-card">
+        <div class="card-top">
+          <h3>Pristionchus pacificus</h3>
+          <span class="assembly">Genome: El Paco</span>
+        </div>
+        <div class="card-body">
+          <div class="card-stats">
+            <div class="cstat">
+              <div class="cn">140</div>
+              <div class="cl">Repeats &ge; 5 kb</div>
+            </div>
+            <div class="cstat">
+              <div class="cn" style="color:#27ae60">37</div>
+              <div class="cl">Locus-specific</div>
+            </div>
+            <div class="cstat">
+              <div class="cn" style="color:#c0392b">103</div>
+              <div class="cl">Excluded</div>
+            </div>
+          </div>
+          <img src="Pristionchus_pacificus_chromosome_map.svg"
+               alt="P. pacificus chromosome map" class="card-map">
+          <a href="Pristionchus_pacificus_probe_report.html"
+             class="card-link" target="_blank">View full report →</a>
+        </div>
+      </div>
+
+      <!-- C. elegans -->
+      <div class="example-card">
+        <div class="card-top">
+          <h3>Caenorhabditis elegans</h3>
+          <span class="assembly">Genome: VC2010</span>
+        </div>
+        <div class="card-body">
+          <div class="card-stats">
+            <div class="cstat">
+              <div class="cn">142</div>
+              <div class="cl">Repeats &ge; 5 kb</div>
+            </div>
+            <div class="cstat">
+              <div class="cn" style="color:#27ae60">47</div>
+              <div class="cl">Locus-specific</div>
+            </div>
+            <div class="cstat">
+              <div class="cn" style="color:#c0392b">95</div>
+              <div class="cl">Excluded</div>
+            </div>
+          </div>
+          <img src="Caenorhabditis_elegans_chromosome_map.svg"
+               alt="C. elegans chromosome map" class="card-map">
+          <a href="Caenorhabditis_elegans_probe_report.html"
+             class="card-link" target="_blank">View full report →</a>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Probe table preview -->
+    <p class="table-caption">Example probes: <em style="text-transform:none;">Pristionchus pacificus</em> (top probe per chromosome by repeat span)</p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Chr</th>
+            <th>Sequence (5′→3′)</th>
+            <th>Span (kb)</th>
+            <th>Tm (°C)</th>
+            <th>GC%</th>
+            <th>In-locus hits</th>
+            <th>Verdict</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>I</td>
+            <td class="mono">CCTCGTGGAGTCCATTCGATCATTG</td>
+            <td>40.1</td><td>38.8</td><td>52</td>
+            <td>517</td>
+            <td><span class="pass-badge">PASS</span></td>
+          </tr>
+          <tr>
+            <td>II</td>
+            <td class="mono">CAGAAACCTCAAGATCTTCGACGAA</td>
+            <td>36.9</td><td>36.4</td><td>44</td>
+            <td>410</td>
+            <td><span class="pass-badge">PASS</span></td>
+          </tr>
+          <tr>
+            <td>III</td>
+            <td class="mono">CGTTGACATTGCACGATCGAATTCC</td>
+            <td>40.5</td><td>38.6</td><td>48</td>
+            <td>1040</td>
+            <td><span class="pass-badge">PASS</span></td>
+          </tr>
+          <tr>
+            <td>IV</td>
+            <td class="mono">GTGCAAGTGCACTCGTTCACAGAGG</td>
+            <td>38.9</td><td>41.6</td><td>56</td>
+            <td>239</td>
+            <td><span class="pass-badge">PASS</span></td>
+          </tr>
+          <tr>
+            <td>V</td>
+            <td class="mono">TGAGGCCCATGCAGATAACTATAGA</td>
+            <td>22.8</td><td>36.6</td><td>44</td>
+            <td>219</td>
+            <td><span class="pass-badge">PASS</span></td>
+          </tr>
+          <tr>
+            <td>X</td>
+            <td class="mono">GTCGACGGCTGCGTCGACTGAAGAG</td>
+            <td>29.3</td><td>44.4</td><td>64</td>
+            <td>734</td>
+            <td><span class="pass-badge">PASS</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <!-- FISH image -->
+    <p class="table-caption" style="margin-top:2.5rem;">Experimentally validated probes from the original publication</p>
+    <figure style="margin: 2rem 0 0; display:flex; flex-direction:column; align-items:center; gap:0.7rem;">
+      <img src="Ppa_probes.png"
+           alt="P. pacificus nuclei labelled with all chromosome probes from Adilardi & Dernburg 2022"
+           style="max-width:720px; width:100%; border-radius:var(--radius); border:1px solid var(--border);">
+      <figcaption style="font-size:0.78rem; color:var(--text-3); font-family:'JetBrains Mono',monospace; letter-spacing:.03em; text-align:center; max-width:720px; line-height:1.6;">
+        <em>P. pacificus</em> meiotic prophase I nuclei after FISH with different
+        combinations of probes. Figure from <a href="https://doi.org/10.1093/g3journal/jkac121" style="color:inherit;">Adilardi &amp; Dernburg, <em>G3</em> (2022)</a>.
+      </figcaption>
+    </figure>
+
+  </div>
+</section>
+
+<!-- Usage -->
+<section id="usage">
+  <div class="container fade-in">
+    <div class="section-label">Quick start</div>
+    <h2>Running the pipeline</h2>
+    <p>
+      Clone the repository, create the conda environment, and run on
+      the built-in test genome to verify the installation.
+      Then point the pipeline at your own genome assembly.
+    </p>
+
+    <div class="code-block"><span class="c"># 1. Install</span>
+<span class="k">git clone</span> <span class="s">https://github.com/renzoadilardi/TandemFISH.git</span>       <span class="c"># download the repository</span>
+<span class="k">cd</span> TandemFISH                                                   <span class="c"># enter the project directory</span>
+<span class="k">CONDA_SUBDIR=osx-64 conda env create -f</span> envs/environment.yaml   <span class="c"># create the conda environment</span>
+<span class="k">conda activate</span> tandemfish                                       <span class="c"># activate the environment</span>
+
+<span class="c"># 2. Verify — run on the built-in test genome</span>
+<span class="k">snakemake</span> --configfile test/config_test.yaml --cores 4          <span class="c"># should complete in ~1 min</span>
+
+<span class="c"># 3. Run on your genome — copy and edit config/config.yaml first</span>
+<span class="k">snakemake</span> --configfile config/my_species.yaml --cores 8         <span class="c"># set --cores to available CPUs</span></div>
+
+    <p style="font-size:.84rem;">
+      For detailed installation instructions see
+      <a href="https://github.com/renzoadilardi/TandemFISH/blob/main/SETUP_MACOS.md">SETUP_MACOS.md</a>.
+      The pipeline is configured via a single YAML file: genome path,
+      species name, FISH resolution, and BLAST parameters.
+    </p>
+
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <p>
+      TandemFISH ·
+      <a href="https://github.com/renzoadilardi/TandemFISH">GitHub</a> ·
+      Based on <a href="https://doi.org/10.1093/g3journal/jkac121">Adilardi &amp; Dernburg, <em>G3</em> (2022)</a>
+    </p>
+    <p style="margin-top:.4rem;">
+      Pipeline developed after publication. AI tools (Claude Code by Anthropic) were used as coding assistants during development.
+    </p>
+  </div>
+</footer>
+
+<script>
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) {
+        setTimeout(() => e.target.classList.add("visible"), i * 60);
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.07 });
+  document.querySelectorAll(".fade-in").forEach(el => observer.observe(el));
+</script>
+
+</body>
+</html>
