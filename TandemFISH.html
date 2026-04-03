@@ -426,13 +426,81 @@
       border-top: 1px solid var(--border);
     }
     footer a { color: var(--accent); }
+
+    /* ── Dark mode ────────────────────────────────────────────────────────── */
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg:        #111113;
+        --bg-white:  #1c1c1f;
+        --border:    #2e2e33;
+        --border-2:  #3f3f46;
+        --accent:    #5b9ef0;
+        --accent-lt: #1a2a40;
+        --teal:      #3dbfb0;
+        --teal-lt:   #0f2825;
+        --text:      #e8e8ec;
+        --text-2:    #a0a0aa;
+        --text-3:    #5e5e68;
+        --gold:      #e0a840;
+        --gold-lt:   #2a1f08;
+      }
+      nav { background: rgba(17,17,19,0.92); }
+      .btn-primary { color: #111113; }
+      .btn-outline { background: transparent; }
+      .pass-badge { background: #1a3a22; color: #6fcf8a; }
+      tr:hover td { background: var(--accent-lt); }
+    }
+
+    /* ── Hamburger nav ────────────────────────────────────────────────────── */
+    .nav-hamburger {
+      display: none;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0.3rem;
+      color: var(--text);
+      line-height: 1;
+    }
+    @media (max-width: 700px) {
+      nav { padding: 0 1.5rem; }
+      .nav-hamburger { display: flex; align-items: center; }
+      .nav-links {
+        display: none;
+        position: fixed;
+        top: 56px; left: 0; right: 0;
+        background: rgba(249,248,245,0.98);
+        backdrop-filter: blur(10px);
+        flex-direction: column;
+        padding: 0.5rem 1.5rem 1.2rem;
+        border-bottom: 1px solid var(--border);
+        gap: 0;
+        z-index: 99;
+      }
+      .nav-links.open { display: flex; }
+      .nav-links a {
+        display: block;
+        padding: 0.75rem 0;
+        font-size: 0.88rem;
+        border-bottom: 1px solid var(--border);
+        border-right: none;
+      }
+      .nav-links a:last-child { border-bottom: none; }
+    }
+    @media (prefers-color-scheme: dark) and (max-width: 700px) {
+      .nav-links { background: rgba(17,17,19,0.98); }
+    }
   </style>
 </head>
 <body>
 
 <nav>
   <a class="nav-brand" href="#">Tandem<span>FISH</span></a>
-  <div class="nav-links">
+  <button class="nav-hamburger" id="nav-hamburger" aria-label="Menu">
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+      <line x1="2" y1="5" x2="18" y2="5"/><line x1="2" y1="10" x2="18" y2="10"/><line x1="2" y1="15" x2="18" y2="15"/>
+    </svg>
+  </button>
+  <div class="nav-links" id="nav-links">
     <a href="index.html">← Back</a>
     <a href="#pipeline">Pipeline</a>
     <a href="#examples">Examples</a>
@@ -743,6 +811,11 @@
     });
   }, { threshold: 0.07 });
   document.querySelectorAll(".fade-in").forEach(el => observer.observe(el));
+
+  const hamburger = document.getElementById('nav-hamburger');
+  const navLinks = document.getElementById('nav-links');
+  hamburger.addEventListener('click', () => navLinks.classList.toggle('open'));
+  navLinks.querySelectorAll('a').forEach(a => a.addEventListener('click', () => navLinks.classList.remove('open')));
 </script>
 
 </body>
