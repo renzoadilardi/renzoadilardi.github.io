@@ -6,7 +6,7 @@
   <title>TandemFISH: Automated FISH Probe Design</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Lora:ital,wght@0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Lora:ital,wght@0,600;1,400&family=JetBrains+Mono:wght@400;500&family=Libre+Baskerville:ital@1&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -264,11 +264,16 @@
       align-items: baseline;
     }
     .card-top h3 {
-      font-family: "Lora", serif;
-      font-style: italic;
+      font-family: "Inter", sans-serif;
+      font-style: normal;
       font-size: 0.96rem;
-      font-weight: 400;
+      font-weight: 500;
       color: var(--text);
+    }
+    .card-top h3 em {
+      font-family: "Inter", sans-serif;
+      font-style: italic;
+      font-weight: 400;
     }
     .card-top .assembly {
       font-family: "JetBrains Mono", monospace;
@@ -624,7 +629,7 @@
       <!-- P. pacificus -->
       <div class="example-card">
         <div class="card-top">
-          <h3>Pristionchus pacificus</h3>
+          <h3><em>Pristionchus pacificus</em></h3>
           <span class="assembly">Genome: El Paco</span>
         </div>
         <div class="card-body">
@@ -652,7 +657,7 @@
       <!-- C. elegans -->
       <div class="example-card">
         <div class="card-top">
-          <h3>Caenorhabditis elegans</h3>
+          <h3><em>Caenorhabditis elegans</em></h3>
           <span class="assembly">Genome: VC2010</span>
         </div>
         <div class="card-body">
