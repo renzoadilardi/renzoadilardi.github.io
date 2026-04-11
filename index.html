@@ -88,8 +88,8 @@
       gap: 3rem;
       align-items: flex-start;
     }
-    .hero-left {}
-    .hero-photo {
+    .hero-left { order: 1; }
+    .hero-photo { order: 2;
       display: flex;
       justify-content: center;
       align-items: flex-start;
@@ -486,9 +486,10 @@
       .nav-links li { border-bottom: 1px solid var(--border); }
       .nav-links li:last-child { border-bottom: none; }
       .nav-links a { display: block; padding: 0.75rem 0; font-size: 0.88rem; border-bottom: none; }
-      .hero { padding: 90px 0 56px; grid-template-columns: 1fr auto; gap: 1.5rem; align-items: start; }
-      .hero-photo { order: 1; justify-content: flex-end; padding-top: 0.5rem; }
-      .hero-photo img { width: 140px; }
+      .hero { padding: 90px 0 56px; display: block; }
+      .hero-photo { float: right; display: block; margin-left: 1rem; margin-bottom: 0.5rem; padding-top: 0.5rem; }
+      .hero-photo img { width: 110px; max-width: 110px; display: block; }
+      .hero-left { width: 100%; }
       .career-item, .edu-item { grid-template-columns: 1fr; gap: 0.4rem; }
       .footer-inner { flex-direction: column; align-items: flex-start; }
     }
@@ -519,6 +520,9 @@
 
   <!-- HERO -->
   <div class="hero" id="about">
+    <div class="hero-photo fade-in">
+      <img src="Renzo.jpeg" alt="Renzo Adilardi" />
+    </div>
     <div class="hero-left">
       <div class="hero-tag fade-in">Spatial Biology · Assay Development · Imaging & Automation · Bay Area, CA</div>
       <h1 class="fade-in">Renzo<br>Adilardi</h1>
@@ -532,9 +536,6 @@
 <a href="https://scholar.google.com/citations?user=uX_oWvUAAAAJ&hl=en" target="_blank" class="btn btn-outline">Google Scholar</a>
       </div>
     </div><!-- /hero-left -->
-    <div class="hero-photo fade-in">
-      <img src="Renzo.jpeg" alt="Renzo Adilardi" />
-    </div>
   </div>
 
   <!-- ABOUT -->
